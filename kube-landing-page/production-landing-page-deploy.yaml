@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: production
+  name: landing-page-deployment
+  labels:
+    app: landing-page-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: landing-page-deployment
+  template:
+    metadata:
+      labels:
+        app: landing-page-deployment
+    spec:
+      containers:
+      - name: landing-page-deployment
+        image: jasnicahuang/landingpage:latest
+        ports:
+        - containerPort: 80
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: production
+  name: landing-page-service
+spec:
+  selector:
+    app: landing-page-deployment
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  namespace: production
+  name: landing-page-ingress
+spec:
+  rules:
+  - host: lp.jasnicahuang.xyz
+    http:
+      paths:
+      - backend:
+          serviceName: landing-page-service
+
