@@ -1,46 +1,39 @@
 pipeline {
-    agent any
+    
     environment {
-        DOCKER_IMAGE_NAME = "jasnicahuang/landingpage"
+        imagename = "jasnicahuang/landingpage"
+        registryCredential = 'docker_hub_login'
+        dockerImage = ''
     }
-        stage('Build Docker Image') {
-            when {
-                branch 'master'
+
+    agent any 
+    stages {
+        stage('Cloning Git') { 
+            steps {
+                git credentialsId: 'github_key', url: 'https://github.com/Jasnicahuang/bp-landing-page.git'
             }
+        }
+        stage('Building Image') { 
             steps {
                 script {
-                    app = docker.build(DOCKER_IMAGE_NAME)
-                    app.inside {
-                        sh 'echo $(curl localhost:8080)'
+                    dockerImage = docker.build imagename 
+                }     
+            }
+        }
+        stage('Push Image to DockerHub') { 
+            steps {
+                script {
+                    docker.withRegistry)('', registryCredential) {
+                        dockerImage.push("$BUILD_NUMBER")
+                        dockerImage.push('latest')
                     }
                 }
             }
         }
-        stage('Push Docker Image') {
-            when {
-                branch 'master'
-            }
+        stage('Remove Unused Images'){
             steps {
-                script {
-                    docker.withRegistry('', 'docker_hub_login') {
-                        app.push("${env.BUILD_NUMBER}")
-                        app.push("latest")
-                    }
-                }
-            }
-        }
-        stage('DeployToProduction') {
-            when {
-                branch 'master'
-            }
-            steps {
-                input 'Deploy to Production?'
-                milestone(1)
-                kubernetesDeploy(
-                    kubeconfigId: 'kubeconfig',
-                    configs: 'kube-landing-page/production-landing-page-deploy.yaml',
-                    enableConfigSubstitution: true
-                )
+                sh "docker rmi $imagename:$BUILD_NUMBER"
+                sh "docker rmi $imagename:latest"
             }
         }
     }
