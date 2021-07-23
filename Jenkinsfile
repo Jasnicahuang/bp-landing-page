@@ -11,6 +11,7 @@ pipeline {
     agent any 
 
     stages {
+        
         stage('Prepare workspace') {
             steps {
                 echo 'Prepare workspace'
@@ -21,9 +22,7 @@ pipeline {
                 // Checkout git
                 checkout scm
             }
-        }
-
-    stages {
+       
         stage('Cloning Git') { 
             steps {
                 git credentialsId: 'github_key', url: 'https://github.com/Jasnicahuang/bp-landing-page.git'
