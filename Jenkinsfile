@@ -156,7 +156,7 @@ pipeline {
                     catch(Exception e) {
                         echo ' No replica set found. '
                     }
-                
+                }
             }
         }  
     }
