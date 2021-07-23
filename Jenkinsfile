@@ -38,14 +38,12 @@ pipeline {
                 script {
                         dockerImage_stage = docker.build imagename_stage     
                 }
-                if ('docker images -f "dangling=true"') {
-                    script {
-                        sh 'docker rmi $(docker images -f "dangling=true" -q)'
+                script{
+                    try {
+                        sh 'docker rmi -f $(docker images -q -f dangling=true)'
                     }
-                } 
-                else {
-                    script {
-                        echo " ================ No Detect Dangling Image ================ "
+                    catch(Exception e){
+                        echo 'No dangling images found. '
                     }
                 }
             }     
@@ -59,14 +57,12 @@ pipeline {
                 script {
                         dockerImage_prod = docker.build imagename_prod   
                 }
-                if ('docker images -f "dangling=true"') {
-                    script {
-                        sh 'docker rmi $(docker images -f "dangling=true" -q)'
+                script{
+                    try {
+                        sh 'docker rmi -f $(docker images -q -f dangling=true)'
                     }
-                } 
-                else {
-                    script {
-                        echo " ================ No Detect Dangling Image ================ "
+                    catch(Exception e){
+                        echo 'No dangling images found. '
                     }
                 }
             }     
