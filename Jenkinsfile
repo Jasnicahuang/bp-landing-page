@@ -123,7 +123,7 @@ pipeline {
                     sed -i 's/$imagename_stage:latest/$imagename_stage:${BUILD_NUMBER}/g' kube-landing-page/staging-landing-page-deploy.yaml
                 '''
                 sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/staging-landing-page-deploy.yaml -n staging"'
-                //sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_stage:${BUILD_NUMBER} --record -n staging"'   
+                sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_stage:${BUILD_NUMBER} --record -n staging"'   
                 script {
                     try {
                         sh '''
@@ -146,7 +146,7 @@ pipeline {
                     sed -i 's/$imagename_prod:latest/$imagename_prod:${BUILD_NUMBER}/g' kube-landing-page/production-landing-page-deploy.yaml
                 '''
                 sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/production-landing-page-deploy.yaml -n production"'
-                //sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_prod:${BUILD_NUMBER} --record -n production"'
+                sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_prod:${BUILD_NUMBER} --record -n production"'
                 script {
                     try {
                         sh '''
