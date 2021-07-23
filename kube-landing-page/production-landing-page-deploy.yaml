@@ -48,4 +48,5 @@ spec:
       paths:
       - backend:
           serviceName: landing-page-service
+          servicePort: 80
 
