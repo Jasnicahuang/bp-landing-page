@@ -54,26 +54,37 @@ pipeline {
 
             }     
         }
-//        stage('Push Image to DockerHub') { 
-//            steps {
-//                script {
-//                    if (env.BRANCH_NAME == 'staging') {
-//                        docker.withRegistry('', registryCredential) 
-//                        {
-//                            dockerImage_stage.push("$BUILD_NUMBER")
-//                            dockerImage_stage.push('latest')
-//                        }   
-//                    }
-//                    else if (env.BRANCH_NAME == 'origin/master') {
-//                        docker.withRegistry('', registryCredential) 
-//                        {
-//                            dockerImage_prod.push("$BUILD_NUMBER")
-//                            dockerImage_prod.push('latest')
-//                        } 
-//                    }
-//                }
-//            }
-//        }
+        
+        stage('Push Image Staging to DockerHub') { 
+            when {
+                branch 'staging'
+            }
+            steps {
+                script {
+                        docker.withRegistry('', registryCredential) 
+                        {
+                            dockerImage_stage.push("$BUILD_NUMBER")
+                            dockerImage_stage.push('latest')
+                        }   
+                }
+            }
+        }
+
+        stage('Push Image Production to DockerHub') { 
+            when {
+                branch 'master'
+            }
+            steps {
+                script {
+                        docker.withRegistry('', registryCredential) 
+                        {
+                            dockerImage_prod.push("$BUILD_NUMBER")
+                            dockerImage_prod.push('latest')
+                        }   
+                }
+            }
+        }
+
 //        stage('Remove Unused Images'){
 //            steps {
 //                if (env.BRANCH_NAME == 'staging') {
