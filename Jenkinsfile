@@ -22,6 +22,7 @@ pipeline {
                 // Checkout git
                 checkout scm
             }
+        }
        
         stage('Cloning Git') { 
             steps {
