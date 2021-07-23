@@ -152,7 +152,7 @@ pipeline {
                 script {
                     replica_prod =
                     sh '''
-                         sudo -u ubuntu -H sh -c "kubectl get all -n production | grep replicaset.apps | grep "0         0         0" | cut -d' ' -f 1"
+                         sudo -u ubuntu -H sh -c "kubectl get rs -n production | grep "0" | cut -d' ' -f 1"
                     '''
                     sh 'sudo -u ubuntu -H sh -c "kubectl delete $replica_prod -n production"'
                 }
