@@ -146,7 +146,7 @@ pipeline {
                 script {
                     try {
                         sh '''
-                            sudo -u ubuntu -H sh -c "kubectl delete $(sudo -u ubuntu -H sh -c "kubectl get rs -n production | grep "0" | cut -d'\ \' -f 1") -n production"
+                            sudo -u ubuntu -H sh -c "kubectl delete $(sudo -u ubuntu -H sh -c "kubectl get rs -n production | grep "0" | cut -d\' \' -f 1") -n production"
                         '''
                     }
                     catch(Exception e) {
