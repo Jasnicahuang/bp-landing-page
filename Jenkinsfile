@@ -46,7 +46,7 @@ pipeline {
             steps {
                 script {
                     if (env.BRANCH_NAME == 'staging') {
-                        docker.withRegistry)('', registryCredential) 
+                        docker.withRegistry('', registryCredential) 
                         {
                             dockerImage_stage.push("$BUILD_NUMBER")
                             dockerImage_stage.push('latest')
