@@ -38,10 +38,13 @@ pipeline {
                 script {
                         dockerImage_stage = docker.build imagename_stage     
                 }
-                script {
-                    if ('docker images -f "dangling=true"') {
+                if ('docker images -f "dangling=true"') {
+                    script {
                         sh 'docker rmi $(docker images -f "dangling=true" -q)'
-                    } else {
+                    }
+                } 
+                else {
+                    script {
                         echo " ================ No Detect Dangling Image ================ "
                     }
                 }
@@ -56,10 +59,13 @@ pipeline {
                 script {
                         dockerImage_prod = docker.build imagename_prod   
                 }
-                script {
-                    if ('docker images -f "dangling=true"') {
+                if ('docker images -f "dangling=true"') {
+                    script {
                         sh 'docker rmi $(docker images -f "dangling=true" -q)'
-                    } else {
+                    }
+                } 
+                else {
+                    script {
                         echo " ================ No Detect Dangling Image ================ "
                     }
                 }
