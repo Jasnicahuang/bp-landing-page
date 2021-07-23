@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: landing-page-deployment
-        image: jasnicahuang/landingpage:latest
+        image: $imagename_stage:$BUILD_NUMBER
         ports:
         - containerPort: 80
 ---
