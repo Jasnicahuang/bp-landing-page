@@ -127,7 +127,7 @@ pipeline {
                 script {
                     try {
                         sh '''
-                            sudo -u ubuntu -H sh -c "kubectl delete $(kubectl get all -n staging | grep replicaset.apps | grep "0         0         0" | cut -d' ' -f 1) -n staging
+                            sudo -u ubuntu -H sh -c "kubectl delete $(kubectl get all -n staging | grep replicaset.apps | grep "0         0         0" | cut -d' ' -f 1) -n staging"
                         '''
                     }
                     catch(Exception e) {
@@ -150,7 +150,7 @@ pipeline {
                 script {
                     try {
                         sh '''
-                            sh 'sudo -u ubuntu -H sh -c "kubectl delete $(kubectl get all -n production | grep replicaset.apps | grep "0         0         0" | cut -d' ' -f 1) -n production
+                            sh 'sudo -u ubuntu -H sh -c "kubectl delete $(kubectl get all -n production | grep replicaset.apps | grep "0         0         0" | cut -d' ' -f 1) -n production"
                         '''
                     }
                     catch(Exception e) {
