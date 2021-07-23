@@ -125,6 +125,7 @@ pipeline {
                 sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/staging-landing-page-deploy.yaml -n staging"'
                 sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_stage:${BUILD_NUMBER} --record -n staging"'   
                 sh 'sudo -u ubuntu -H sh -c "kubectl delete $(kubectl get all -n staging | grep replicaset.apps | grep "0         0         0" | cut -d' ' -f 1) -n staging"'
+
             }
         }
         
