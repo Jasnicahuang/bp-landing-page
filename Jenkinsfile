@@ -33,6 +33,7 @@ pipeline {
                 }
             }
         }
+
 //        stage('Building Image') { 
 //            steps {
 //                script {
@@ -91,8 +92,7 @@ pipeline {
 //                sh "kubectl delete pod --all -n production"
 //            }
 //
-//        }
-
-        
+//        }       
     }
 }
+
