@@ -26,12 +26,7 @@ pipeline {
        
         stage('Cloning Git') { 
             steps {
-                if (env.BRANCH_NAME == 'staging') {
-                    git branch: 'staging', credentialsId: 'github_key', url: 'https://github.com/Jasnicahuang/bp-landing-page.git'
-                }
-                else if (env.BRANCH_NAME == 'origin/master') {
                     git credentialsId: 'github_key', url: 'https://github.com/Jasnicahuang/bp-landing-page.git'
-                }
             }
         }
 
