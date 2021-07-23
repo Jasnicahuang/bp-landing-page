@@ -6,8 +6,6 @@ pipeline {
         registryCredential = 'docker_hub_login'
         dockerImage_prod = ''
         dockerImage_stage = ''
-        replica_stage = ''
-        replica_prod = ''
     }
 
     agent any 
@@ -150,11 +148,17 @@ pipeline {
                 sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/production-landing-page-deploy.yaml -n production"'
                 sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_prod:${BUILD_NUMBER} --record -n production"'
                 script {
-                    replica_prod =
+                    def replica_prod = [
                     sh '''
                          sudo -u ubuntu -H sh -c "kubectl get rs -n production | grep "0" | cut -d' ' -f 1"
                     '''
-                    sh 'sudo -u ubuntu -H sh -c "kubectl delete $replica_prod -n production"'
+                    ]
+                    replica_prod.each { rs ->
+ //                   sh '''
+ //                        sudo -u ubuntu -H sh -c "kubectl get rs -n production | grep "0" | cut -d' ' -f 1"
+ //                   '''
+                        sh 'sudo -u ubuntu -H sh -c "kubectl delete ${rs} -n production"'
+                    }
                 }
             }
         }  
