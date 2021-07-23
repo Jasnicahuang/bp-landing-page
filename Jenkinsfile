@@ -126,7 +126,7 @@ pipeline {
                 kubernetesDeploy(
                 kubeconfigId: 'kubeconfig',
                 configs: 'kube-landing-page/production-landing-page-deploy.yaml',
-                enableConfigSubstitution: true,
+                enableConfigSubstitution: true
                 )
                 
             }
