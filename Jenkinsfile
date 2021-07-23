@@ -53,7 +53,7 @@ pipeline {
                         }   
                     }
                     else if (env.BRANCH_NAME == 'origin/master') {
-                        docker.withRegistry)('', registryCredential) 
+                        docker.withRegistry('', registryCredential) 
                         {
                             dockerImage_prod.push("$BUILD_NUMBER")
                             dockerImage_prod.push('latest')
