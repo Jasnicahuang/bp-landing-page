@@ -125,7 +125,7 @@ pipeline {
                 
                 script {
                     try {
-                           def list_rs = [echo $(sh 'sudo -u ubuntu -H sh -c "kubectl get rs -n staging | grep "0" | cut -d\' \' -f 1"')]
+                           def list_rs = echo $(sh 'sudo -u ubuntu -H sh -c "kubectl get rs -n staging | grep "0" | cut -d\' \' -f 1"')
                            def echo_all(list_rs) {
                                list_rs.each { item -> 
                                    echo "Hello ${item}"
