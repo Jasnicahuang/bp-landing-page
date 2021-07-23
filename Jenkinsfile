@@ -125,7 +125,10 @@ pipeline {
                 
                 script {
                     try {
-                        sh 'sudo -u ubuntu -H sh -c "kubectl get rs -n staging | grep "0         0         0" | awk \'{print $1}\' | xargs  kubectl delete -n staging rs"'
+                        sh """
+                        #!/bin/bash
+                        sudo -u ubuntu -H sh -c "kubectl get rs -n staging | grep "0         0         0" | awk '{print $1}' | xargs  kubectl delete -n staging rs"
+                        """
                     }
                     catch(Exception e) {
                         echo ' No replica set found. '
