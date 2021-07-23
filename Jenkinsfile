@@ -6,6 +6,8 @@ pipeline {
         registryCredential = 'docker_hub_login'
         dockerImage_prod = ''
         dockerImage_stage = ''
+        replica_stage = ''
+        replica_prod = ''
     }
 
     agent any 
@@ -150,7 +152,9 @@ pipeline {
                 script {
                     try {
                         sh '''
-                            sudo -u ubuntu -H sh -c "kubectl delete $(kubectl get all -n production | grep replicaset.apps | grep "0         0         0" | cut -d' ' -f 1) -n production"
+                            replica_prod = sudo -u ubuntu -H sh -c "kubectl get all -n production | grep replicaset.apps | grep "0         0         0" | cut -d' ' -f 1"
+                            sudo -u ubuntu -H sh -c "kubectl delete $replica_prod -n production"
+                            
                         '''
                     }
                     catch(Exception e) {
