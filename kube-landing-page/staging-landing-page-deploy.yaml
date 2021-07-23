@@ -18,7 +18,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: landing-page-deployment
-        image: $imagename_stage:$BUILD_NUMBER
+        image: jasnicahuang/landingpage-stage:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80
