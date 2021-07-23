@@ -22,64 +22,107 @@ pipeline {
                 // Checkout git
                 checkout scm
             }
+        }
        
         stage('Cloning Git') { 
             steps {
-                if (env.BRANCH_NAME == 'staging') {
-                    git branch: 'staging', credentialsId: 'github_key', url: 'https://github.com/Jasnicahuang/bp-landing-page.git'
-                }
-                else if (env.BRANCH_NAME == 'origin/master') {
                     git credentialsId: 'github_key', url: 'https://github.com/Jasnicahuang/bp-landing-page.git'
+            }
+        }
+
+        stage('Building Image Staging') { 
+            when {
+                branch 'staging'
+            }
+            steps {
+                script {
+                        dockerImage_stage = docker.build imagename_stage     
+                }
+                script{
+                    try {
+                        sh 'docker rmi -f $(docker images -q -f dangling=true)'
+                    }
+                    catch(Exception e){
+                        echo 'No dangling images found. '
+                    }
+                }
+            }     
+        }
+
+        stage('Building Image Production') { 
+            when {
+                branch 'master'
+            }
+            steps {
+                script {
+                        dockerImage_prod = docker.build imagename_prod   
+                }
+                script{
+                    try {
+                        sh 'docker rmi -f $(docker images -q -f dangling=true)'
+                    }
+                    catch(Exception e){
+                        echo 'No dangling images found. '
+                    }
+                }
+            }     
+        }
+        
+        stage('Push Image Staging to DockerHub') { 
+            when {
+                branch 'staging'
+            }
+            steps {
+                script {
+                        docker.withRegistry('', registryCredential) 
+                        {
+                            dockerImage_stage.push("$BUILD_NUMBER")
+                            dockerImage_stage.push('latest')
+
+                            sh "docker rmi $imagename_stage:$BUILD_NUMBER"
+                            sh "docker rmi $imagename_stage:latest"
+                        }   
                 }
             }
         }
 
-//        stage('Building Image') { 
-//            steps {
-//                script {
-//                    if (env.BRANCH_NAME == 'staging') {
-//                        dockerImage_stage = docker.build imagename_stage
-//                    
-//                    }
-//                    else if (env.BRANCH_NAME == 'origin/master') {
-//                        dockerImage_prod = docker.build imagename
-//                    }
-//                }     
-//            }
-//        }
-//        stage('Push Image to DockerHub') { 
-//            steps {
-//                script {
-//                    if (env.BRANCH_NAME == 'staging') {
-//                        docker.withRegistry('', registryCredential) 
-//                        {
-//                            dockerImage_stage.push("$BUILD_NUMBER")
-//                            dockerImage_stage.push('latest')
-//                        }   
-//                    }
-//                    else if (env.BRANCH_NAME == 'origin/master') {
-//                        docker.withRegistry('', registryCredential) 
-//                        {
-//                            dockerImage_prod.push("$BUILD_NUMBER")
-//                            dockerImage_prod.push('latest')
-//                        } 
-//                    }
-//                }
-//            }
-//        }
-//        stage('Remove Unused Images'){
-//            steps {
-//                if (env.BRANCH_NAME == 'staging') {
-//                    sh "docker rmi $imagename_stage:$BUILD_NUMBER"
-//                    sh "docker rmi $imagename_stage:latest"
-//                }
-//                else if (env.BRANCH_NAME == 'origin/master') {
-//                    sh "docker rmi $imagename_stage:$BUILD_NUMBER"
-//                    sh "docker rmi $imagename_stage:latest"
-//                }
-//                
-//            }
-//        }
+        stage('Push Image Production to DockerHub') { 
+            when {
+                branch 'master'
+            }
+            steps {
+                script {
+                        docker.withRegistry('', registryCredential) 
+                        {
+                            dockerImage_prod.push("$BUILD_NUMBER")
+                            dockerImage_prod.push('latest')
+
+                            sh "docker rmi $imagename_prod:$BUILD_NUMBER"
+                            sh "docker rmi $imagename_prod:latest"
+                        }   
+                }
+            }
+        }
+        
+        stage('Deploy To Staging') {
+            when {
+                branch 'staging'
+            }
+            steps {
+                sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/staging-landing-page-deploy.yaml -n staging"'
+                
+            }
+        }
+        
+        stage('Deploy To Production') {
+            when {
+                branch 'master'
+            }
+            steps {
+                sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/production-landing-page-deploy.yaml -n production"'            
+            }
+        }
+
 //        if (env.BRANCH_NAME == 'staging') {
 //            stage('Deploy to Staging'){
 //                sh "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=jasnicahuang/$imagenam_stage:latest -n staging"

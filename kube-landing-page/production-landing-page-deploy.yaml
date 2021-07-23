@@ -15,9 +15,11 @@ spec:
       labels:
         app: landing-page-deployment
     spec:
+      terminationGracePeriodSeconds: 30
       containers:
       - name: landing-page-deployment
-        image: jasnicahuang/landingpage:latest
+        image: $imagename_prod:$BUILD_NUMBER
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
 ---
