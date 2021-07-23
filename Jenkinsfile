@@ -109,7 +109,7 @@ pipeline {
                 branch 'staging'
             }
             steps {
-                sh "kubectl apply -f ./kube-landing-page/staging-landing-page-deploy.yaml -n staging"
+                sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/staging-landing-page-deploy.yaml -n staging"'
                 
             }
         }
@@ -119,8 +119,7 @@ pipeline {
                 branch 'master'
             }
             steps {
-                sh "kubectl apply -f ./kube-landing-page/production-landing-page-deploy.yaml -n production"
-                
+                sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/production-landing-page-deploy.yaml -n production"'            
             }
         }
 
