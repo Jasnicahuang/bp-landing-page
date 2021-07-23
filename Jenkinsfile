@@ -150,7 +150,7 @@ pipeline {
                 script {
                     try {
                         sh '''
-                            sh 'sudo -u ubuntu -H sh -c "kubectl delete $(kubectl get all -n production | grep replicaset.apps | grep "0         0         0" | cut -d' ' -f 1) -n production"
+                            sudo -u ubuntu -H sh -c "kubectl delete $(kubectl get all -n production | grep replicaset.apps | grep "0         0         0" | cut -d' ' -f 1) -n production"
                         '''
                     }
                     catch(Exception e) {
