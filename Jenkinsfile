@@ -110,7 +110,7 @@ pipeline {
             }
             steps {
                 sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/staging-landing-page-deploy.yaml -n staging"'
-                
+                sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_stage:${BUILD_NUMBER}'               
             }
         }
         
@@ -119,23 +119,10 @@ pipeline {
                 branch 'master'
             }
             steps {
-                sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/production-landing-page-deploy.yaml -n production"'            
+                sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/production-landing-page-deploy.yaml -n production"'
+                sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_prod:${BUILD_NUMBER}' 
             }
-        }
-
-//        if (env.BRANCH_NAME == 'staging') {
-//            stage('Deploy to Staging'){
-//                sh "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=jasnicahuang/$imagenam_stage:latest -n staging"
-//                sh "kubectl delete pod --all -n staging"
-//            }
-//        }
-//        else if (env.BRANCH_NAME == 'origin/master'){
-//            stage('Deploy to Production'){
-//                sh "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=jasnicahuang/$imagenam_prod:latest -n production"
-//                sh "kubectl delete pod --all -n production"
-//            }
-//
-//        }       
+        }  
     }
 }
 
