@@ -36,10 +36,15 @@ pipeline {
             }
             steps {
                 script {
-                        dockerImage_stage = docker.build imagename_stage
-                    
+                        dockerImage_stage = docker.build imagename_stage     
                 }
-
+                script {
+                    if ('docker images -f "dangling=true"') {
+                        sh 'docker rmi $(docker images -f "dangling=true" -q)'
+                    } else {
+                        echo " ================ No Detect Dangling Image ================ "
+                    }
+                }
             }     
         }
 
@@ -51,7 +56,13 @@ pipeline {
                 script {
                         dockerImage_prod = docker.build imagename_prod   
                 }
-
+                script {
+                    if ('docker images -f "dangling=true"') {
+                        sh 'docker rmi $(docker images -f "dangling=true" -q)'
+                    } else {
+                        echo " ================ No Detect Dangling Image ================ "
+                    }
+                }
             }     
         }
         
@@ -90,20 +101,35 @@ pipeline {
                 }
             }
         }
+        
+        stage('Deploy To Staging') {
+            when {
+                branch 'staging'
+            }
+            steps {
+                kubernetesDeploy(
+                kubeconfigId: 'kubeconfig',
+                configs: 'kube-landing-page/staging-landing-page-deploy.yaml',
+                enableConfigSubstitution: true,
+                )
+                
+            }
+        }
+        
+        stage('Deploy To Production') {
+            when {
+                branch 'master'
+            }
+            steps {
+                kubernetesDeploy(
+                kubeconfigId: 'kubeconfig',
+                configs: 'kube-landing-page/production-landing-page-deploy.yaml',
+                enableConfigSubstitution: true,
+                )
+                
+            }
+        }
 
-//        stage('Remove Unused Images'){
-//            steps {
-//                if (env.BRANCH_NAME == 'staging') {
-//                    sh "docker rmi $imagename_stage:$BUILD_NUMBER"
-//                    sh "docker rmi $imagename_stage:latest"
-//                }
-//                else if (env.BRANCH_NAME == 'origin/master') {
-//                    sh "docker rmi $imagename_stage:$BUILD_NUMBER"
-//                    sh "docker rmi $imagename_stage:latest"
-//                }
-//                
-//            }
-//        }
 //        if (env.BRANCH_NAME == 'staging') {
 //            stage('Deploy to Staging'){
 //                sh "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=jasnicahuang/$imagenam_stage:latest -n staging"
