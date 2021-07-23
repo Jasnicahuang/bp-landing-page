@@ -158,7 +158,7 @@ pipeline {
  //                        sudo -u ubuntu -H sh -c "kubectl get rs -n production | grep "0" | cut -d' ' -f 1"
  //                   '''
                         sh 'sudo -u ubuntu -H sh -c "kubectl delete ${rs_prod} -n production"'
-                    }
+                    
                 }
             }
         }  
