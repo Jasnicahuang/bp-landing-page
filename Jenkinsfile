@@ -140,18 +140,12 @@ pipeline {
                 branch 'master'
             }
             steps {
-                script {
-                    sh '''
-                    "sed -i 's/$imagename_prod:latest/$imagename_prod:${BUILD_NUMBER}/g' kube-landing-page/production-landing-page-deploy.yaml"
-                    ''' 
+                sh 'sed -i \'s/$imagename_prod:latest/$imagename_prod:${BUILD_NUMBER}/g\' kube-landing-page/production-landing-page-deploy.yaml'
                 sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/production-landing-page-deploy.yaml -n production"'
                 sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_prod:${BUILD_NUMBER} --record -n production"'
-                }
                 script {
                     try {
-                        sh '''
-                            sudo -u ubuntu -H sh -c "kubectl delete $(sh'''sudo -u ubuntu -H sh -c "kubectl get rs -n production | grep "0" | cut -d' ' -f 1"''') -n production"
-                        '''
+                            sh 'sudo -u ubuntu -H sh -c "kubectl delete $(kubectl get rs -n production | grep "0" | cut -d\' \' -f 1) -n production"'
                     }
                     catch(Exception e) {
                         echo ' No replica set found. '
