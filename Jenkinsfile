@@ -109,11 +109,7 @@ pipeline {
                 branch 'staging'
             }
             steps {
-                kubernetesDeploy(
-                kubeconfigId: 'kubeconfig',
-                configs: 'kube-landing-page/staging-landing-page-deploy.yaml',
-                enableConfigSubstitution: true,
-                )
+                sh "kubectl apply -f ./kube-landing-page/staging-landing-page-deploy.yaml -n staging"
                 
             }
         }
@@ -123,11 +119,7 @@ pipeline {
                 branch 'master'
             }
             steps {
-                kubernetesDeploy(
-                kubeconfigId: 'kubeconfig',
-                configs: 'kube-landing-page/production-landing-page-deploy.yaml',
-                enableConfigSubstitution: true
-                )
+                sh "kubectl apply -f ./kube-landing-page/production-landing-page-deploy.yaml -n production"
                 
             }
         }
