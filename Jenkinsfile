@@ -130,8 +130,8 @@ pipeline {
                            //def echo_all(list_rs) {
                            //    list_rs.each { item -> 
                             //       echo "Hello ${item}"
-                               }
-                           }
+                             //  }
+                           //}
                            //sh 'sudo -u ubuntu -H sh -c "kubectl delete $(sudo -u ubuntu -H sh -c "kubectl get rs -n staging | grep "0" | cut -d\' \' -f 1") -n staging"'
                     }
                     catch(Exception e) {
