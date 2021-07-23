@@ -26,7 +26,17 @@ pipeline {
        
         stage('Cloning Git') { 
             steps {
-                    git credentialsId: 'github_key', url: 'https://github.com/Jasnicahuang/bp-landing-page.git'
+                script {
+                    if (env.BRANCH_NAME == 'staging') {
+                        git branch: 'staging', credentialsId: 'github_key', url: 'https://github.com/Jasnicahuang/bp-landing-page.git'
+                    }
+                    else if (env.BRANCH_NAME == 'master') {
+                        git credentialsId: 'github_key', url: 'https://github.com/Jasnicahuang/bp-landing-page.git'
+                    }
+                    else {
+                        echo 'This is not master or staging'
+                    }
+                }
             }
         }
 
@@ -43,7 +53,7 @@ pipeline {
                         sh 'docker rmi -f $(docker images -q -f dangling=true)'
                     }
                     catch(Exception e){
-                        echo 'No dangling images found. '
+                        echo ' No dangling images found. '
                     }
                 }
             }     
@@ -62,7 +72,7 @@ pipeline {
                         sh 'docker rmi -f $(docker images -q -f dangling=true)'
                     }
                     catch(Exception e){
-                        echo 'No dangling images found. '
+                        echo ' No dangling images found. '
                     }
                 }
             }     
@@ -109,8 +119,21 @@ pipeline {
                 branch 'staging'
             }
             steps {
+                sh '''
+                    sed -i 's/$imagename_stage:latest/$imagename_stage:${BUILD_NUMBER}/g' kube-landing-page/staging-landing-page-deploy.yaml
+                '''
                 sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/staging-landing-page-deploy.yaml -n staging"'
-                sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_stage:${BUILD_NUMBER} -n staging"'               
+                sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_stage:${BUILD_NUMBER} --record -n staging"'   
+                script {
+                    try {
+                        sh '''
+                            sudo -u ubuntu -H sh -c "kubectl delete $(kubectl get all -n staging | grep replicaset.apps | grep "0         0         0" | cut -d' ' -f 1) -n staging
+                        '''
+                    }
+                    catch(Exception e) {
+                        echo ' No replica set found. '
+                    }
+                }
             }
         }
         
@@ -119,8 +142,21 @@ pipeline {
                 branch 'master'
             }
             steps {
+                 sh '''
+                    sed -i 's/$imagename_prod:latest/$imagename_prod:${BUILD_NUMBER}/g' kube-landing-page/production-landing-page-deploy.yaml
+                '''
                 sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/production-landing-page-deploy.yaml -n production"'
-                sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_prod:${BUILD_NUMBER} -n production"' 
+                sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_prod:${BUILD_NUMBER} --record -n production"'
+                script {
+                    try {
+                        sh '''
+                            sh 'sudo -u ubuntu -H sh -c "kubectl delete $(kubectl get all -n production | grep replicaset.apps | grep "0         0         0" | cut -d' ' -f 1) -n production
+                        '''
+                    }
+                    catch(Exception e) {
+                        echo ' No replica set found. '
+                    }
+                }
             }
         }  
     }
