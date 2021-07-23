@@ -119,13 +119,15 @@ pipeline {
                 branch 'staging'
             }
             steps {
-                sh 'sed -i \'s/$imagename_stage:latest/$imagename_stage:${BUILD_NUMBER}/g\' kube-landing-page/staging-landing-page-deploy.yaml'
+                //sh 'sed -i \'s/$imagename_stage:latest/$imagename_stage:${BUILD_NUMBER}/g\' kube-landing-page/staging-landing-page-deploy.yaml'
                 sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/staging-landing-page-deploy.yaml -n staging"'
                 sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_stage:${BUILD_NUMBER} --record -n staging"'                 
                 
                 script {
                     try {
-                            sh 'sudo -u ubuntu -H sh -c "kubectl delete $(kubectl get rs -n production | grep "0" | cut -d\' \' -f 1) -n staging"'
+                        sh '''#!/bin/bash -xe
+                        returnStdout: true, script: sudo -u ubuntu -H sh -c "kubectl get rs -n staging | grep "0" | cut -d' ' -f 1 | xargs kubectl delete -n staging rs"
+                        '''
                     }
                     catch(Exception e) {
                         echo ' No replica set found. '
@@ -139,12 +141,14 @@ pipeline {
                 branch 'master'
             }
             steps {
-                sh 'sed -i \'s/$imagename_prod:latest/$imagename_prod:${BUILD_NUMBER}/g\' kube-landing-page/production-landing-page-deploy.yaml'
+                //sh "sed -i \'s/$imagename_prod:latest/$imagename_prod:${BUILD_NUMBER}/g\' kube-landing-page/production-landing-page-deploy.yaml"
                 sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/production-landing-page-deploy.yaml -n production"'
                 sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_prod:${BUILD_NUMBER} --record -n production"'
+
                 script {
                     try {
-                            sh 'sudo -u ubuntu -H sh -c "kubectl delete $(kubectl get rs -n production | grep "0" | cut -d\' \' -f 1) -n production"'
+                        sh 'sudo -u ubuntu -H sh -c "kubectl get rs -n production | grep "0" | awk \'{ print {$}{1} }\' | xargs kubectl delete -n production rs"'
+
                     }
                     catch(Exception e) {
                         echo ' No replica set found. '
