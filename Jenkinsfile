@@ -148,16 +148,13 @@ pipeline {
                 sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/production-landing-page-deploy.yaml -n production"'
                 sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_prod:${BUILD_NUMBER} --record -n production"'
                 script {
-                    def replica_prod = [
-                    sh '''
-                         sudo -u ubuntu -H sh -c "kubectl get rs -n production | grep "0" | cut -d' ' -f 1"
-                    '''
-                    ]
-                    replica_prod.each { rs ->
+                    def replica_prod = sh'sudo -u ubuntu -H sh -c "kubectl get rs -n production | grep "0" | cut -d' ' -f 1"'
+                    def rs_prod = sh( returnStdout: true, script: replica_prod)
+                        echo "$rs_prod"
  //                   sh '''
  //                        sudo -u ubuntu -H sh -c "kubectl get rs -n production | grep "0" | cut -d' ' -f 1"
  //                   '''
-                        sh 'sudo -u ubuntu -H sh -c "kubectl delete ${rs} -n production"'
+                        sh 'sudo -u ubuntu -H sh -c "kubectl delete ${rs_prod} -n production"'
                     }
                 }
             }
