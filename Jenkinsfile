@@ -30,19 +30,30 @@ pipeline {
             }
         }
 
-//        stage('Building Image') { 
-//            steps {
-//                script {
-//                    if (env.BRANCH_NAME == 'staging') {
-//                        dockerImage_stage = docker.build imagename_stage
-//                    
-//                    }
-//                    else if (env.BRANCH_NAME == 'origin/master') {
-//                        dockerImage_prod = docker.build imagename
-//                    }
-//                }     
-//            }
-//        }
+        stage('Building Image Staging') { 
+            when {
+                branch 'staging'
+            }
+            steps {
+                script {
+                        dockerImage_stage = docker.build imagename_stage
+                    
+                }
+
+            }     
+        }
+
+        stage('Building Image Production') { 
+            when {
+                branch 'master'
+            }
+            steps {
+                script {
+                        dockerImage_prod = docker.build imagename_prod   
+                }
+
+            }     
+        }
 //        stage('Push Image to DockerHub') { 
 //            steps {
 //                script {
