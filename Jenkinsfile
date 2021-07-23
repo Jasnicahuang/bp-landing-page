@@ -125,14 +125,7 @@ pipeline {
                 
                 script {
                     try {
-                           def list_rs = sh 'sudo -u ubuntu -H sh -c "kubectl get rs -n staging | grep "0" | cut -d\' \' -f 1"'
-                           echo $list_rs
-                           //def echo_all(list_rs) {
-                           //    list_rs.each { item -> 
-                            //       echo "Hello ${item}"
-                             //  }
-                           //}
-                           //sh 'sudo -u ubuntu -H sh -c "kubectl delete $(sudo -u ubuntu -H sh -c "kubectl get rs -n staging | grep "0" | cut -d\' \' -f 1") -n staging"'
+                        sh 'sudo -u ubuntu -H sh -c "kubectl get rs -n staging | grep "0         0         0" | awk \'{print $1}\' | xargs  kubectl delete -n staging rs"
                     }
                     catch(Exception e) {
                         echo ' No replica set found. '
@@ -152,9 +145,7 @@ pipeline {
 
                 script {
                     try {
-                        sh '''
-                            sudo -u ubuntu -H sh -c "kubectl delete $(sudo -u ubuntu -H sh -c "kubectl get rs -n production | grep "0" | cut -d\' \' -f 1") -n production"
-                        '''
+                        sh 'sudo -u ubuntu -H sh -c "kubectl get rs -n staging | grep "0         0         0" | awk \'{print $1}\' | xargs  kubectl delete -n staging rs"
                     }
                     catch(Exception e) {
                         echo ' No replica set found. '
