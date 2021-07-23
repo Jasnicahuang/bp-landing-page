@@ -110,7 +110,7 @@ pipeline {
             }
             steps {
                 sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/staging-landing-page-deploy.yaml -n staging"'
-                sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_stage:${BUILD_NUMBER}"'               
+                sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_stage:${BUILD_NUMBER} -n staging"'               
             }
         }
         
@@ -120,7 +120,7 @@ pipeline {
             }
             steps {
                 sh 'sudo -u ubuntu -H sh -c "kubectl apply -f kube-landing-page/production-landing-page-deploy.yaml -n production"'
-                sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_prod:${BUILD_NUMBER}"' 
+                sh 'sudo -u ubuntu -H sh -c "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=$imagename_prod:${BUILD_NUMBER} -n staging"' 
             }
         }  
     }
