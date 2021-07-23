@@ -75,20 +75,20 @@ pipeline {
                 
             }
         }
-        if (env.BRANCH_NAME == 'staging') {
-            stage('Deploy to Staging'){
-                sh "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=jasnicahuang/$imagenam_stage:latest -n staging"
-                sh "kubectl delete pod --all -n staging"
-            }
-        }
-        else if (env.BRANCH_NAME == 'origin/master'){
-            stage('Deploy to Production'){
+        stage('Deploy Apps') {
+            steps {
+                if (env.BRANCH_NAME == 'staging') {
+                    sh "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=jasnicahuang/$imagenam_stage:latest -n staging"
+                    sh "kubectl delete pod --all -n staging"
+                }
+                else if (env.BRANCH_NAME == 'origin/master'){
                 sh "kubectl set image deployment.apps/landing-page-deployment landing-page-deployment=jasnicahuang/$imagenam_prod:latest -n production"
                 sh "kubectl delete pod --all -n production"
+                }
             }
-
+            
         }
-
         
     }
 }
+
