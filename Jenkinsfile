@@ -65,6 +65,9 @@ pipeline {
                         {
                             dockerImage_stage.push("$BUILD_NUMBER")
                             dockerImage_stage.push('latest')
+
+                            sh "docker rmi $imagename_stage:$BUILD_NUMBER"
+                            sh "docker rmi $imagename_stage:latest"
                         }   
                 }
             }
@@ -80,6 +83,9 @@ pipeline {
                         {
                             dockerImage_prod.push("$BUILD_NUMBER")
                             dockerImage_prod.push('latest')
+
+                            sh "docker rmi $imagename_prod:$BUILD_NUMBER"
+                            sh "docker rmi $imagename_prod:latest"
                         }   
                 }
             }
